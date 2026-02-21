@@ -1660,8 +1660,30 @@
                     btnPublish.disabled = false;
                     btnPublish.innerHTML = origHTML;
 
-                    const slug = genSlug();
-                    const liveUrl = `https://3d-showcase.app/v/${slug}`;
+                    // Generate real dynamic URL
+                    const baseUrl = 'https://simone96v.github.io/Blob-AR/index.html';
+                    const params = new URLSearchParams();
+
+                    if (curModelUrl) params.set('model', curModelUrl);
+                    if (curLogo) params.set('logo', curLogo); // Note: local blobs won't work cross-device, but URLs will
+
+                    params.set('bg', inpBgType.value === 'gradient' ? `${inpC1.value},${inpC2.value}` : inpBg.value);
+                    params.set('cta', togCta.checked);
+                    params.set('ar', togAr.checked);
+
+                    if (togCta.checked) {
+                        if (inpCtaTx.value) params.set('ctaTx', inpCtaTx.value);
+                        if (inpCtaLk.value) params.set('ctaLk', inpCtaLk.value);
+                        params.set('radius', inpRad.value);
+                        params.set('ctaBg', inpBgType.value === 'gradient' ? `${inpC1.value},${inpC2.value}` : inpC1.value);
+                        params.set('tc', inpTc.value);
+                        params.set('font', inpFf.value);
+                        params.set('fstyle', inpFs.value);
+                    }
+
+                    if (!inpShd.checked) params.set('shd', '0');
+
+                    const liveUrl = baseUrl + '?' + params.toString();
                     const iframeCode = `<iframe src="${liveUrl}" width="100%" height="600" frameborder="0" allow="xr-spatial-tracking" allowfullscreen></iframe>`;
 
                     pubLink.value = liveUrl;
