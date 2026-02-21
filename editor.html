@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Showcase – Editor Pro</title>
+    <meta name="description"
+        content="Professional 3D product showcase editor with AR, HDRI lighting, custom CTA design, and QR-based desktop AR." />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        /* ══════════════════════════════════════════════════════════
+   RESET & TOKENS
+   ══════════════════════════════════════════════════════════ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --sb-w: 400px;
+            --bg: #0a0a0a;
+            --sb: #111111;
+            --card: #1a1a1d;
+            --inp: #222226;
+            --inp-h: #2c2c30;
+            --bdr: #2a2a2e;
+            --bdr-f: #3b82f6;
+            --tx: #e0e0e0;
+            --tx2: #a1a1aa;
+            --tx3: #71717a;
+            --ac: #3b82f6;
+            --ac-g: rgba(59, 130, 246, .22);
+            --gn: #22c55e;
+            --gn-g: rgba(34, 197, 94, .14);
+            --pv: #f5f5f7;
+            --r: 8px;
+            --rl: 12px;
+            --rp: 50px;
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --ease: cubic-bezier(.4, 0, .2, 1);
+            --dur: .22s;
+        }
+
+        html,
+        body {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--tx);
+            -webkit-font-smoothing: antialiased
+        }
+
+        body {
+            display: flex
+        }
+
+        /* ══════════════════════════════════════════════════════════
+   SIDEBAR
+   ══════════════════════════════════════════════════════════ */
+        .sidebar {
+            width: var(--sb-w);
+            min-width: var(--sb-w);
+            height: 100vh;
+            background: var(--sb);
+            border-right: 1px solid var(--bdr);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 50px;
+            z-index: 20
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #2e2e32;
+            border-radius: 10px
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #444
+        }
+
+        .sb-head {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--bdr);
+            position: sticky;
+            top: 0;
+            background: var(--sb);
+            z-index: 5
+        }
+
+        .sb-ic {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--r);
+            background: linear-gradient(135deg, var(--ac), #a855f7);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0
+        }
+
+        .sb-ic svg {
+            width: 16px;
+            height: 16px;
+            stroke: #fff;
+            fill: none
+        }
+
+        .sb-head h1 {
+            font-size: .95rem;
+            font-weight: 700;
+            letter-spacing: -.01em
+        }
+
+        .sb-head .tag {
+            margin-left: auto;
+            padding: 3px 9px;
+            border-radius: var(--rp);
+            background: rgba(168, 85, 247, .15);
+            color: #c084fc;
+            font-size: .55rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase
+        }
+
+        /* section */
+        .sec {
+            margin: 10px;
+            padding: 15px;
+            background: var(--card);
+            border-radius: var(--rl);
+            border: 1px solid var(--bdr)
+        }
+
+        .sec-t {
+            font-size: .58rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--tx3);
+            margin-bottom: 13px
+        }
+
+        /* ── dropzone ────────────────────────────────────────── */
+        .dz {
+            position: relative;
+            border: 2px dashed var(--bdr);
+            border-radius: var(--r);
+            background: var(--inp);
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+            margin-bottom: 8px
+        }
+
+        .dz:last-child {
+            margin-bottom: 0
+        }
+
+        .dz:hover,
+        .dz.over {
+            border-color: var(--ac);
+            background: rgba(59, 130, 246, .05);
+            box-shadow: 0 0 0 3px var(--ac-g)
+        }
+
+        .dz.done {
+            border-style: solid;
+            border-color: var(--gn);
+            background: var(--gn-g)
+        }
+
+        .dz input[type="file"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer
+        }
+
+        .dz-ic {
+            margin-bottom: 5px
+        }
+
+        .dz-ic svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--tx3);
+            fill: none;
+            transition: stroke var(--dur) var(--ease)
+        }
+
+        .dz:hover .dz-ic svg,
+        .dz.over .dz-ic svg {
+            stroke: var(--ac)
+        }
+
+        .dz.done .dz-ic svg {
+            stroke: var(--gn)
+        }
+
+        .dz-tx {
+            font-size: .72rem;
+            font-weight: 500;
+            color: var(--tx2);
+            line-height: 1.45
+        }
+
+        .dz-tx span {
+            color: var(--ac);
+            font-weight: 600
+        }
+
+        .dz.done .dz-tx {
+            color: var(--gn)
+        }
+
+        .dz-sub {
+            font-size: .6rem;
+            color: var(--tx3);
+            margin-top: 2px
+        }
+
+        /* ── field ───────────────────────────────────────────── */
+        .fld {
+            margin-bottom: 15px
+        }
+
+        .fld:last-child {
+            margin-bottom: 0
+        }
+
+        .fld label,
+        .fld-lbl {
+            display: block;
+            font-size: .68rem;
+            font-weight: 600;
+            color: var(--tx2);
+            margin-bottom: 5px
+        }
+
+        .fld input[type="text"],
+        .fld input[type="url"] {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            background: var(--inp);
+            color: var(--tx);
+            font-family: var(--font);
+            font-size: .8rem;
+            outline: none;
+            transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background var(--dur) var(--ease)
+        }
+
+        .fld input:focus {
+            border-color: var(--ac);
+            background: var(--inp-h);
+            box-shadow: 0 0 0 3px var(--ac-g)
+        }
+
+        /* color row */
+        .cr {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .cr input[type="color"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 34px;
+            height: 28px;
+            border: 2px solid var(--bdr);
+            border-radius: 6px;
+            background: none;
+            cursor: pointer;
+            padding: 2px;
+            transition: border-color var(--dur) var(--ease)
+        }
+
+        .cr input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0
+        }
+
+        .cr input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 3px
+        }
+
+        .cr input[type="color"]:hover {
+            border-color: var(--ac)
+        }
+
+        .cr .hx {
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--tx3);
+            font-family: 'Courier New', monospace
+        }
+
+        /* range */
+        .rw {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .rw input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 4px;
+            background: var(--bdr);
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer
+        }
+
+        .rw input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--ac);
+            box-shadow: 0 0 6px var(--ac-g);
+            cursor: pointer;
+            transition: transform var(--dur) var(--ease)
+        }
+
+        .rw input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15)
+        }
+
+        .rv {
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--tx2);
+            min-width: 30px;
+            text-align: right;
+            font-variant-numeric: tabular-nums
+        }
+
+        /* toggle */
+        .tr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px
+        }
+
+        .tr:last-child {
+            margin-bottom: 0
+        }
+
+        .tr .tl {
+            font-size: .74rem;
+            font-weight: 500;
+            color: var(--tx2)
+        }
+
+        .tog {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            background: var(--inp);
+            border: 1px solid var(--bdr);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+            flex-shrink: 0
+        }
+
+        .tog input {
+            display: none
+        }
+
+        .tog .dot {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--tx3);
+            transition: transform var(--dur) var(--ease), background var(--dur) var(--ease)
+        }
+
+        .tog input:checked~.dot {
+            transform: translateX(17px);
+            background: #fff
+        }
+
+        .tog:has(input:checked) {
+            background: var(--ac);
+            border-color: var(--ac)
+        }
+
+        /* select / dropdown */
+        .sel {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            background: var(--inp);
+            color: var(--tx);
+            font-family: var(--font);
+            font-size: .8rem;
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='2 4 6 8 10 4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 30px;
+            transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease)
+        }
+
+        .sel:focus {
+            border-color: var(--ac);
+            box-shadow: 0 0 0 3px var(--ac-g)
+        }
+
+        /* conditional section */
+        .cond {
+            transition: opacity var(--dur) var(--ease), max-height .35s var(--ease);
+            max-height: 1000px;
+            overflow: visible
+        }
+
+        .cond.off {
+            opacity: .35;
+            pointer-events: none;
+            overflow: hidden;
+            max-height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important
+        }
+
+        /* ── buttons ─────────────────────────────────────────── */
+        .btn-gen {
+            width: 100%;
+            padding: 11px 16px;
+            border: none;
+            border-radius: var(--r);
+            background: var(--tx);
+            color: var(--sb);
+            font-family: var(--font);
+            font-size: .82rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease)
+        }
+
+        .btn-gen:hover {
+            opacity: .88;
+            transform: translateY(-1px)
+        }
+
+        .btn-gen:active {
+            transform: scale(.98)
+        }
+
+        .btn-gen svg {
+            width: 15px;
+            height: 15px;
+            stroke: var(--sb);
+            fill: none
+        }
+
+        .embed-out {
+            display: none;
+            margin-top: 12px;
+            animation: fadeIn .3s var(--ease)
+        }
+
+        .embed-out.show {
+            display: block
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .embed-out textarea {
+            width: 100%;
+            height: 160px;
+            padding: 10px;
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            background: var(--inp);
+            color: var(--gn);
+            font-family: 'Courier New', monospace;
+            font-size: .66rem;
+            resize: vertical;
+            outline: none
+        }
+
+        .brow {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px
+        }
+
+        .brow>button {
+            flex: 1
+        }
+
+        .btn-o {
+            padding: 8px 10px;
+            border: 1px solid var(--bdr);
+            border-radius: var(--r);
+            background: transparent;
+            color: var(--tx2);
+            font-family: var(--font);
+            font-size: .72rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all var(--dur) var(--ease)
+        }
+
+        .btn-o:hover {
+            background: var(--inp);
+            border-color: var(--tx3);
+            color: var(--tx)
+        }
+
+        .btn-o svg {
+            width: 13px;
+            height: 13px;
+            stroke: currentColor;
+            fill: none
+        }
+
+        .btn-o.ok {
+            background: var(--gn-g);
+            border-color: var(--gn);
+            color: var(--gn)
+        }
+
+        .sb-ft {
+            padding: 12px 20px;
+            text-align: center;
+            font-size: .58rem;
+            color: var(--tx3);
+            margin-top: auto;
+            border-top: 1px solid var(--bdr)
+        }
+
+        /* ══════════════════════════════════════════════════════════
+   PREVIEW
+   ══════════════════════════════════════════════════════════ */
+        .preview {
+            flex: 1;
+            position: relative;
+            background: var(--pv);
+            overflow: hidden;
+            transition: background var(--dur) var(--ease)
+        }
+
+        .preview model-viewer {
+            width: 100%;
+            height: 100%;
+            --poster-color: transparent;
+            background: transparent
+        }
+
+        .pv-badge {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            z-index: 10;
+            padding: 4px 12px;
+            border-radius: var(--rp);
+            background: rgba(0, 0, 0, .4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            font-size: .55rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .6);
+            border: 1px solid rgba(255, 255, 255, .06)
+        }
+
+        .pv-logo {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            max-height: 40px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 10px rgba(0, 0, 0, .18));
+            transition: opacity var(--dur) var(--ease)
+        }
+
+        .pv-logo:not([src]),
+        .pv-logo[src=""] {
+            display: none
+        }
+
+        /* CTA link */
+        .pv-cta {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: #fff;
+            font-family: var(--font);
+            font-size: .86rem;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .18);
+            transition: transform .2s var(--ease), box-shadow .2s var(--ease);
+        }
+
+        .pv-cta:hover {
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .25)
+        }
+
+        .pv-cta:active {
+            transform: translateX(-50%) scale(.97)
+        }
+
+        .pv-cta svg {
+            display: none
+        }
+
+        /* AR button */
+        .ar-btn {
+            position: absolute;
+            bottom: 40px;
+            right: 24px;
+            z-index: 10;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, .7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
+            transition: transform var(--dur) var(--ease), background var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+        }
+
+        .ar-btn:hover {
+            background: rgba(0, 0, 0, .85);
+            transform: scale(1.08);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, .3)
+        }
+
+        .ar-btn:active {
+            transform: scale(.95)
+        }
+
+        .ar-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: #fff;
+            fill: none
+        }
+
+        /* ══════════════════════════════════════════════════════════
+   QR MODAL
+   ══════════════════════════════════════════════════════════ */
+        .qr-modal {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            background: var(--pv);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            transition: opacity .3s var(--ease);
+        }
+
+        .qr-modal.open {
+            display: flex
+        }
+
+        .qr-modal .qr-logo {
+            max-height: 36px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .12))
+        }
+
+        .qr-modal .qr-logo:not([src]),
+        .qr-modal .qr-logo[src=""] {
+            display: none
+        }
+
+        .qr-modal .qr-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-align: center;
+            letter-spacing: -.01em
+        }
+
+        .qr-modal .qr-sub {
+            font-size: .82rem;
+            color: #666;
+            text-align: center;
+            margin-top: -16px;
+            max-width: 300px;
+            line-height: 1.5
+        }
+
+        .qr-modal .qr-img {
+            width: 220px;
+            height: 220px;
+            border-radius: var(--rl);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .08);
+            border: 1px solid rgba(0, 0, 0, .06)
+        }
+
+        .qr-close {
+            padding: 10px 28px;
+            border: 1px solid #ddd;
+            border-radius: var(--rp);
+            background: #fff;
+            color: #333;
+            font-family: var(--font);
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--dur) var(--ease)
+        }
+
+        .qr-close:hover {
+            background: #f0f0f0;
+            border-color: #bbb
+        }
+
+        /* ══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════════════════════ */
+        /* ── mobile tab bar ─────────────────────────────────── */
+        .mob-tabs {
+            display: none
+        }
+
+        @media(max-width:820px) {
+            body {
+                flex-direction: column;
+                height: 100vh;
+                height: 100dvh
+            }
+
+            .mob-tabs {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 200;
+                background: #0d0d0d;
+                border-top: 1px solid var(--bdr);
+                padding: 0;
+                height: 52px
+            }
+
+            .mob-tab {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                background: none;
+                border: none;
+                color: var(--tx3);
+                font-family: var(--font);
+                font-size: .72rem;
+                font-weight: 600;
+                cursor: pointer;
+                padding: 10px 0;
+                transition: color var(--dur) var(--ease)
+            }
+
+            .mob-tab.active {
+                color: var(--ac)
+            }
+
+            .mob-tab svg {
+                width: 18px;
+                height: 18px;
+                stroke: currentColor;
+                fill: none
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: unset;
+                height: calc(100vh - 52px);
+                height: calc(100dvh - 52px);
+                border-right: none;
+                border-bottom: 1px solid var(--bdr)
+            }
+
+            .sidebar.mob-hide {
+                display: none
+            }
+
+            .preview {
+                flex: 1;
+                width: 100%;
+                height: calc(100vh - 52px);
+                height: calc(100dvh - 52px)
+            }
+
+            .preview.mob-hide {
+                display: none
+            }
+
+            .sb-head {
+                position: sticky;
+                top: 0;
+                z-index: 5
+            }
+
+            .sb-ft {
+                padding-bottom: 60px
+            }
+
+            .pv-cta {
+                bottom: 70px;
+                padding: 10px 22px;
+                font-size: .78rem
+            }
+
+            .ar-btn {
+                bottom: 70px;
+                right: 16px;
+                width: 46px;
+                height: 46px
+            }
+
+            .pv-badge {
+                top: 10px;
+                right: 12px;
+                font-size: .5rem
+            }
+
+            .qr-modal {
+                position: fixed;
+                bottom: 52px;
+                top: 0
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <aside class="sidebar">
+
+        <div class="sb-head">
+            <div class="sb-ic"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                </svg></div>
+            <h1>3D Editor</h1>
+            <span class="tag">Pro</span>
+        </div>
+
+        <!-- A: Assets -->
+        <div class="sec">
+            <div class="sec-t">Assets</div>
+            <div class="dz" id="dz-model">
+                <input type="file" accept=".glb,.gltf" id="f-model" />
+                <div class="dz-ic"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                        <line x1="12" y1="22.08" x2="12" y2="12" />
+                    </svg></div>
+                <div class="dz-tx">Drag & drop <span>.glb</span> model or click to browse</div>
+                <div class="dz-sub">3D model file</div>
+            </div>
+            <div class="fld" style="margin-top:8px">
+                <label>or Model URL <span style="opacity:.5;font-weight:400">(for AR / QR sharing)</span></label>
+                <input class="url-field" type="url" id="inp-model-url" placeholder="https://example.com/model.glb" />
+            </div>
+            <div class="dz" id="dz-logo">
+                <input type="file" accept="image/*" id="f-logo" />
+                <div class="dz-ic"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <polyline points="21 15 16 10 5 21" />
+                    </svg></div>
+                <div class="dz-tx">Drag & drop <span>logo image</span> or click to browse</div>
+                <div class="dz-sub">PNG, SVG, JPG</div>
+            </div>
+            <div class="dz" id="dz-hdri">
+                <input type="file" accept=".hdr,.jpg,.jpeg,.png,.exr" id="f-hdri" />
+                <div class="dz-ic"><svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg></div>
+                <div class="dz-tx">Drag & drop <span>HDRI / env map</span> or click to browse</div>
+                <div class="dz-sub">.hdr, .jpg environment</div>
+            </div>
+        </div>
+
+        <!-- B: Scene Settings -->
+        <div class="sec">
+            <div class="sec-t">Scene Settings</div>
+            <div class="fld">
+                <label>Background Color</label>
+                <div class="cr"><input type="color" id="inp-bg" value="#f5f5f7" /><span class="hx"
+                        id="hx-bg">#F5F5F7</span></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="tr">
+                <span class="tl">Floor Shadow</span>
+                <label class="tog"><input type="checkbox" id="inp-shd" checked /><span class="dot"></span></label>
+            </div>
+        </div>
+
+        <!-- C: UI Toggles -->
+        <div class="sec">
+            <div class="sec-t">UI Toggles</div>
+            <div class="tr">
+                <span class="tl">Enable Link CTA</span>
+                <label class="tog"><input type="checkbox" id="tog-cta" checked /><span class="dot"></span></label>
+            </div>
+            <div class="tr">
+                <span class="tl">Enable AR Button</span>
+                <label class="tog"><input type="checkbox" id="tog-ar" checked /><span class="dot"></span></label>
+            </div>
+        </div>
+
+        <!-- D: Link CTA Design -->
+        <div class="sec cond" id="sec-cta">
+            <div class="sec-t">Link CTA Design</div>
+
+            <div class="fld">
+                <label>CTA Text</label>
+                <input type="text" id="inp-cta-tx" value="Discover more" placeholder="Button text…" />
+            </div>
+            <div class="fld">
+                <label>CTA Link</label>
+                <input type="url" id="inp-cta-lk" value="#" placeholder="https://…" />
+            </div>
+            <div class="fld">
+                <label>Background Type</label>
+                <select class="sel" id="inp-bg-type">
+                    <option value="solid">Solid Color</option>
+                    <option value="gradient" selected>Gradient</option>
+                </select>
+            </div>
+            <div class="fld">
+                <label>Color 1</label>
+                <div class="cr"><input type="color" id="inp-c1" value="#007bff" /><span class="hx"
+                        id="hx-c1">#007BFF</span></div>
+            </div>
+            <div class="fld" id="fld-c2">
+                <label>Color 2</label>
+                <div class="cr"><input type="color" id="inp-c2" value="#0056b3" /><span class="hx"
+                        id="hx-c2">#0056B3</span></div>
+            </div>
+            <div class="fld">
+                <label>Button Radius</label>
+                <div class="rw"><input type="range" id="inp-rad" min="0" max="50" step="1" value="25" /><span class="rv"
+                        id="rv-rad">25px</span></div>
+            </div>
+            <div class="fld">
+                <label>Text Color</label>
+                <div class="cr"><input type="color" id="inp-tc" value="#ffffff" /><span class="hx"
+                        id="hx-tc">#FFFFFF</span></div>
+            </div>
+            <div class="fld">
+                <label>Font Family</label>
+                <select class="sel" id="inp-ff">
+                    <option value="'Inter', sans-serif" selected>Inter</option>
+                    <option value="'Roboto', sans-serif">Roboto</option>
+                    <option value="'Montserrat', sans-serif">Montserrat</option>
+                    <option value="sans-serif">sans-serif</option>
+                </select>
+            </div>
+            <div class="fld">
+                <label>Font Style</label>
+                <select class="sel" id="inp-fs">
+                    <option value="normal" selected>Normal</option>
+                    <option value="bold">Bold</option>
+                    <option value="italic">Italic</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- E: Export -->
+        <div class="sec">
+            <div class="sec-t">Export</div>
+            <button class="btn-gen" id="btn-gen">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                </svg>
+                Generate Embed Code
+            </button>
+            <div class="embed-out" id="embed-out">
+                <textarea readonly id="embed-code"></textarea>
+                <div class="brow">
+                    <button class="btn-o" id="btn-refresh" style="color:var(--ac)">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10" />
+                            <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+                        </svg>Refresh
+                    </button>
+                    <button class="btn-o" id="btn-copy"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                        </svg>Copy Code</button>
+                    <button class="btn-o" id="btn-save" style="color:var(--gn)"><svg viewBox="0 0 24 24"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>Save HTML</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sb-ft">3D Showcase Editor Pro</div>
+    </aside>
+
+    <!-- ══════════ PREVIEW ══════════ -->
+    <main class="preview" id="pv">
+        <span class="pv-badge">● Live Preview</span>
+        <img class="pv-logo" id="pv-logo" src="" alt="Logo" />
+
+        <model-viewer id="mv" src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" alt="3D product preview"
+            camera-controls shadow-intensity="1" ar ar-modes="webxr scene-viewer quick-look"
+            touch-action="pan-y"></model-viewer>
+
+        <!-- Link CTA -->
+        <a class="pv-cta" id="pv-cta" href="#" target="_blank" rel="noopener">Discover more</a>
+
+        <!-- Custom AR Button -->
+        <button class="ar-btn" id="ar-btn" title="View in AR">
+            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l9 5.25v7.5L12 21l-9-5.25v-7.5L12 3z" />
+                <path d="M12 12l9-5.25" />
+                <path d="M12 12v9" />
+                <path d="M12 12L3 6.75" />
+                <circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none" />
+            </svg>
+        </button>
+
+        <!-- QR Modal -->
+        <div class="qr-modal" id="qr-modal">
+            <img class="qr-logo" id="qr-logo" src="" alt="Logo" />
+            <div class="qr-title">View in Augmented Reality</div>
+            <div class="qr-sub">Scan this QR code with your phone to see the product in your space</div>
+            <img class="qr-img" id="qr-img" src="" alt="QR Code" />
+            <button class="qr-close" id="qr-close">Close</button>
+        </div>
+    </main>
+
+    <!-- ── Mobile Tab Bar ── -->
+    <div class="mob-tabs" id="mob-tabs">
+        <button class="mob-tab active" id="mt-edit">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+            Editor
+        </button>
+        <button class="mob-tab" id="mt-prev">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+            </svg>
+            Preview
+        </button>
+    </div>
+
+    <!-- ══════════ JS ══════════ -->
+    <script>
+        (() => {
+            /* ── refs ───────────────────────────────────────── */
+            const mv = document.getElementById('mv');
+            const pvLogo = document.getElementById('pv-logo');
+            const pvCta = document.getElementById('pv-cta');
+            const pvBox = document.getElementById('pv');
+            const arBtn = document.getElementById('ar-btn');
+
+            const dzModel = document.getElementById('dz-model');
+            const fModel = document.getElementById('f-model');
+            const dzLogo = document.getElementById('dz-logo');
+            const fLogo = document.getElementById('f-logo');
+            const dzHdri = document.getElementById('dz-hdri');
+            const fHdri = document.getElementById('f-hdri');
+
+            const inpBg = document.getElementById('inp-bg');
+            const hxBg = document.getElementById('hx-bg');
+            const inpShd = document.getElementById('inp-shd');
+
+            const togCta = document.getElementById('tog-cta');
+            const togAr = document.getElementById('tog-ar');
+            const secCta = document.getElementById('sec-cta');
+
+            const inpCtaTx = document.getElementById('inp-cta-tx');
+            const inpCtaLk = document.getElementById('inp-cta-lk');
+            const inpBgType = document.getElementById('inp-bg-type');
+            const inpC1 = document.getElementById('inp-c1');
+            const hxC1 = document.getElementById('hx-c1');
+            const inpC2 = document.getElementById('inp-c2');
+            const hxC2 = document.getElementById('hx-c2');
+            const fldC2 = document.getElementById('fld-c2');
+            const inpRad = document.getElementById('inp-rad');
+            const rvRad = document.getElementById('rv-rad');
+            const inpTc = document.getElementById('inp-tc');
+            const hxTc = document.getElementById('hx-tc');
+            const inpFf = document.getElementById('inp-ff');
+            const inpFs = document.getElementById('inp-fs');
+
+            const btnGen = document.getElementById('btn-gen');
+            const embedOut = document.getElementById('embed-out');
+            const embedCode = document.getElementById('embed-code');
+            const btnCopy = document.getElementById('btn-copy');
+            const btnSave = document.getElementById('btn-save');
+            const btnRefresh = document.getElementById('btn-refresh');
+
+            const qrModal = document.getElementById('qr-modal');
+            const qrImg = document.getElementById('qr-img');
+            const qrLogo = document.getElementById('qr-logo');
+            const qrClose = document.getElementById('qr-close');
+
+            let curModel = 'https://modelviewer.dev/shared-assets/models/Astronaut.glb';
+            let curModelUrl = '';  // shareable remote URL (not blob)
+            let curLogo = '';
+            let curHdri = '';
+
+            /* ── read query params on load ─────────────────── */
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('model')) {
+                curModel = params.get('model');
+                curModelUrl = curModel;
+                mv.setAttribute('src', curModel);
+            }
+
+            const inpModelUrl = document.getElementById('inp-model-url');
+
+            /* ── mobile tabs ──────────────────────────────── */
+            const mtEdit = document.getElementById('mt-edit');
+            const mtPrev = document.getElementById('mt-prev');
+            const sidebar = document.querySelector('.sidebar');
+            const preview = document.querySelector('.preview');
+
+            function switchTab(tab) {
+                if (tab === 'edit') {
+                    sidebar.classList.remove('mob-hide');
+                    preview.classList.add('mob-hide');
+                    mtEdit.classList.add('active');
+                    mtPrev.classList.remove('active');
+                } else {
+                    sidebar.classList.add('mob-hide');
+                    preview.classList.remove('mob-hide');
+                    mtEdit.classList.remove('active');
+                    mtPrev.classList.add('active');
+                }
+            }
+
+            mtEdit.addEventListener('click', () => switchTab('edit'));
+            mtPrev.addEventListener('click', () => switchTab('prev'));
+
+            /* ── dropzone helper ───────────────────────────── */
+            function initDZ(zone, inp, cb) {
+                ['dragenter', 'dragover'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.classList.add('over'); }));
+                ['dragleave', 'drop'].forEach(e => zone.addEventListener(e, ev => { ev.preventDefault(); zone.classList.remove('over'); }));
+                zone.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) cb(f, zone); });
+                inp.addEventListener('change', () => { const f = inp.files[0]; if (f) cb(f, zone); });
+            }
+            function markDone(z, n) {
+                z.classList.add('done');
+                z.querySelector('.dz-tx').innerHTML = `<strong>${n}</strong>`;
+                z.querySelector('.dz-sub').textContent = 'Loaded ✓';
+            }
+
+            initDZ(dzModel, fModel, (f, z) => { curModel = URL.createObjectURL(f); curModelUrl = ''; mv.setAttribute('src', curModel); markDone(z, f.name); inpModelUrl.value = ''; });
+            initDZ(dzLogo, fLogo, (f, z) => { curLogo = URL.createObjectURL(f); pvLogo.src = curLogo; pvLogo.style.display = 'block'; qrLogo.src = curLogo; markDone(z, f.name); });
+            initDZ(dzHdri, fHdri, (f, z) => { curHdri = URL.createObjectURL(f); mv.setAttribute('environment-image', curHdri); markDone(z, f.name); });
+
+            /* ── model URL input ───────────────────────────── */
+            inpModelUrl.addEventListener('change', () => {
+                const url = inpModelUrl.value.trim();
+                if (url) {
+                    curModel = url;
+                    curModelUrl = url;
+                    mv.setAttribute('src', url);
+                    markDone(dzModel, 'URL model');
+                }
+            });
+
+            /* ── background ────────────────────────────────── */
+            inpBg.addEventListener('input', () => { pvBox.style.background = inpBg.value; hxBg.textContent = inpBg.value.toUpperCase(); });
+
+            /* ── shadow ────────────────────────────────────── */
+            inpShd.addEventListener('change', () => { mv.setAttribute('shadow-intensity', inpShd.checked ? '1' : '0'); });
+
+            /* ── UI toggles ────────────────────────────────── */
+            togCta.addEventListener('change', () => {
+                pvCta.style.display = togCta.checked ? '' : 'none';
+                secCta.classList.toggle('off', !togCta.checked);
+            });
+            togAr.addEventListener('change', () => { arBtn.style.display = togAr.checked ? '' : 'none'; });
+
+            /* ── CTA bg type ───────────────────────────────── */
+            inpBgType.addEventListener('change', () => {
+                fldC2.style.display = inpBgType.value === 'gradient' ? '' : 'none';
+                applyCtaStyle();
+            });
+
+            /* ── CTA style ─────────────────────────────────── */
+            function applyCtaStyle() {
+                if (inpBgType.value === 'gradient') {
+                    pvCta.style.background = `linear-gradient(90deg, ${inpC1.value}, ${inpC2.value})`;
+                } else {
+                    pvCta.style.background = inpC1.value;
+                }
+                pvCta.style.borderRadius = inpRad.value + 'px';
+                pvCta.style.color = inpTc.value;
+                pvCta.style.fontFamily = inpFf.value;
+                const fs = inpFs.value;
+                pvCta.style.fontWeight = fs === 'bold' ? '700' : '400';
+                pvCta.style.fontStyle = fs === 'italic' ? 'italic' : 'normal';
+            }
+
+            inpCtaTx.addEventListener('input', () => { pvCta.textContent = inpCtaTx.value; applyCtaStyle(); });
+            inpCtaLk.addEventListener('input', () => { pvCta.href = inpCtaLk.value.trim() || '#'; });
+            inpC1.addEventListener('input', () => { hxC1.textContent = inpC1.value.toUpperCase(); applyCtaStyle(); });
+            inpC2.addEventListener('input', () => { hxC2.textContent = inpC2.value.toUpperCase(); applyCtaStyle(); });
+            inpRad.addEventListener('input', () => { rvRad.textContent = inpRad.value + 'px'; applyCtaStyle(); });
+            inpTc.addEventListener('input', () => { hxTc.textContent = inpTc.value.toUpperCase(); applyCtaStyle(); });
+            inpFf.addEventListener('change', applyCtaStyle);
+            inpFs.addEventListener('change', applyCtaStyle);
+
+            applyCtaStyle();
+
+            /* ── Custom AR flow ────────────────────────────── */
+            arBtn.addEventListener('click', () => {
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isMobile) {
+                    mv.activateAR();
+                } else {
+                    // Desktop: show QR modal — swap localhost to LAN IP for scannable QR
+                    const loc = window.location;
+                    let qrData = loc.href.split('?')[0]; // base URL without params
+                    if (loc.protocol === 'file:') {
+                        qrData = 'https://example.com';
+                    } else if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') {
+                        qrData = qrData.replace(loc.hostname, '192.168.178.38');
+                    }
+                    // append model URL if available
+                    if (curModelUrl) {
+                        qrData += '?model=' + encodeURIComponent(curModelUrl);
+                    }
+                    const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(qrData);
+                    qrImg.src = qrUrl;
+                    qrModal.classList.add('open');
+                    // sync modal bg with preview bg
+                    qrModal.style.background = inpBg.value;
+                    // adjust text color for light/dark bg
+                    const isLight = isLightColor(inpBg.value);
+                    qrModal.querySelector('.qr-title').style.color = isLight ? '#1a1a1a' : '#f5f5f5';
+                    qrModal.querySelector('.qr-sub').style.color = isLight ? '#666' : '#aaa';
+                }
+            });
+
+            qrClose.addEventListener('click', () => { qrModal.classList.remove('open'); });
+
+            function isLightColor(hex) {
+                const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+                return (r * 299 + g * 587 + b * 114) / 1000 > 128;
+            }
+
+            /* ── generate ──────────────────────────────────── */
+            function generateEmbed() {
+                const ctaBg = inpBgType.value === 'gradient'
+                    ? `linear-gradient(90deg,${inpC1.value},${inpC2.value})`
+                    : inpC1.value;
+                const showCta = togCta.checked;
+                const showAr = togAr.checked;
+
+                const page = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Product Viewer</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"><\/script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:${inpBg.value}}
+    model-viewer{position:fixed;inset:0;width:100%;height:100%}
+    .logo{position:absolute;top:30px;left:50%;transform:translateX(-50%);z-index:10;max-height:40px;width:auto;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(0,0,0,.18))}
+    .cta{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);z-index:10;padding:12px 28px;border:none;border-radius:${inpRad.value}px;background:${ctaBg};color:${inpTc.value};font-family:'Inter',sans-serif;font-size:.86rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.18);transition:transform .2s}
+    .cta:hover{transform:translateX(-50%) translateY(-2px)}
+    .cta svg{width:14px;height:14px;stroke:currentColor;fill:none}
+    .ar-b{position:absolute;bottom:40px;right:24px;z-index:10;width:52px;height:52px;border-radius:50%;border:none;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);color:#fff;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:transform .2s}
+    .ar-b:hover{transform:scale(1.08)}
+    .ar-b svg{width:24px;height:24px;stroke:#fff;fill:none}
+    .qr-m{position:fixed;inset:0;z-index:100;background:${inpBg.value};display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+    .qr-m.open{display:flex}
+    .qr-m .t{font-size:1.1rem;font-weight:700;color:#1a1a1a}
+    .qr-m .s{font-size:.82rem;color:#666;text-align:center;max-width:300px}
+    .qr-m img.qr{width:220px;height:220px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+    .qr-m img.ql{max-height:36px;width:auto}
+    .qr-m img.ql:not([src]),.qr-m img.ql[src=""]{display:none}
+    .qr-m button{padding:10px 28px;border:1px solid #ddd;border-radius:50px;background:#fff;color:#333;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer}
+  </style>
+</head>
+<body>
+  ${curLogo ? `<img class="logo" src="${curLogo}" alt="Logo"/>` : ''}
+  <model-viewer id="mv" src="${curModel}" alt="3D Model" camera-controls ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="${inpShd.checked ? '1' : '0'}"${curHdri ? ` environment-image="${curHdri}"` : ''} touch-action="pan-y"></model-viewer>
+  ${showCta ? `<a class="cta" href="${inpCtaLk.value.trim() || '#'}" target="_blank" rel="noopener">${inpCtaTx.value.trim()} <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>` : ''}
+  ${showAr ? `<button class="ar-b" id="arb" title="View in AR"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5.25v7.5L12 21l-9-5.25v-7.5L12 3z"/><path d="M12 12l9-5.25"/><path d="M12 12v9"/><path d="M12 12L3 6.75"/><circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none"/></svg></button>` : ''}
+  ${showAr ? `<div class="qr-m" id="qrm">${curLogo ? `<img class="ql" src="${curLogo}" alt="Logo"/>` : ''}<div class="t">View in Augmented Reality</div><div class="s">Scan this QR code with your phone to see the product in your space</div><img class="qr" id="qri" src="" alt="QR"/><button onclick="document.getElementById('qrm').classList.remove('open')">Close</button></div>` : ''}
+  <script>
+    ${showAr ? `document.getElementById('arb').addEventListener('click',()=>{const m=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);if(m){document.getElementById('mv').activateAR()}else{const q=document.getElementById('qrm');document.getElementById('qri').src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data='+encodeURIComponent(window.location.href);q.classList.add('open')}});` : ''}
+  <\/script>
+</body>
+</html>`;
+
+                embedCode.value = page;
+                embedOut.classList.add('show');
+                embedOut.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            btnGen.addEventListener('click', generateEmbed);
+            btnRefresh.addEventListener('click', () => { generateEmbed(); flash(btnRefresh, 'Updated!'); });
+
+            /* ── copy / save ───────────────────────────────── */
+            btnCopy.addEventListener('click', () => { navigator.clipboard.writeText(embedCode.value).then(() => flash(btnCopy, 'Copied!')); });
+            btnSave.addEventListener('click', () => {
+                const c = embedCode.value; if (!c) return;
+                const b = new Blob([c], { type: 'text/html' }), u = URL.createObjectURL(b);
+                const a = document.createElement('a'); a.href = u; a.download = 'viewer.html';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u);
+                flash(btnSave, 'Saved!');
+            });
+
+            function flash(btn, msg) {
+                const o = btn.innerHTML; btn.classList.add('ok');
+                btn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${msg}`;
+                setTimeout(() => { btn.innerHTML = o; btn.classList.remove('ok'); }, 2000);
+            }
+        })();
+    </script>
+</body>
+
+</html>

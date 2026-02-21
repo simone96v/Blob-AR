@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Product Viewer – AR Experience</title>
+  <meta name="description" content="Explore products in stunning 3D and Augmented Reality. Interact, rotate, and view in your own space." />
+
+  <!-- Google Model Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════ BASE LAYER – 3D Model ═══════════ -->
+  <model-viewer
+    id="viewer"
+    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+    alt="3D product model"
+    camera-controls
+    ar
+    auto-rotate
+    shadow-intensity="1"
+    touch-action="pan-y"
+  >
+    <!-- Custom AR button (optional override) -->
+    <button slot="ar-button" id="ar-btn" aria-label="View in AR">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3l9.5 5.5v11L12 25l-9.5-5.5v-11z" transform="scale(0.85) translate(2,0)"/>
+        <path d="M12 3v11"/>
+        <path d="M2.5 8.5L12 14l9.5-5.5"/>
+      </svg>
+      <span>View in AR</span>
+    </button>
+  </model-viewer>
+
+  <!-- ═══════════ UI OVERLAY ═══════════ -->
+  <div class="ui-overlay">
+
+    <!-- Top-left logo -->
+    <div class="logo-container">
+      <img src="logo.png" alt="Brand logo" class="logo" />
+    </div>
+
+    <!-- Bottom-center CTA -->
+    <div class="cta-container">
+      <button class="cta-btn" id="cta-discover">
+        Discover more
+        <span class="cta-arrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

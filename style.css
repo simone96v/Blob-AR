@@ -1,0 +1,247 @@
+/* ============================================================
+   3D Product Viewer – Style Sheet
+   ============================================================ */
+
+/* ── Reset & Global ───────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #111111;
+  --surface: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --accent: #3b82f6;            /* electric blue */
+  --accent-hover: #60a5fa;
+  --accent-glow: rgba(59, 130, 246, 0.35);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Model Viewer (Base Layer) ────────────────────────────── */
+model-viewer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  --poster-color: transparent;
+  background: transparent;
+}
+
+/* Subtle radial spotlight behind the model */
+model-viewer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 55%,
+    rgba(59, 130, 246, 0.06) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Custom AR button styling */
+#ar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 10;
+}
+
+#ar-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+}
+
+#ar-btn:active {
+  transform: scale(0.97);
+}
+
+/* ── UI Overlay ───────────────────────────────────────────── */
+.ui-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;          /* let clicks pass through to model */
+}
+
+.ui-overlay > * {
+  pointer-events: auto;          /* re-enable clicks on actual UI */
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+.logo-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  max-height: 40px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);   /* ensure white on dark bg */
+  opacity: 0.9;
+  transition: opacity var(--transition);
+}
+
+.logo:hover {
+  opacity: 1;
+}
+
+/* ── CTA Button ───────────────────────────────────────────── */
+.cta-container {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 36px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px var(--accent-glow),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: var(--transition);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cta-btn:hover {
+  background: var(--accent-hover);
+  box-shadow:
+    0 6px 30px var(--accent-glow),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.cta-btn:active {
+  transform: scale(0.97) translateY(0);
+  box-shadow:
+    0 2px 12px var(--accent-glow),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.cta-arrow {
+  display: inline-flex;
+  align-items: center;
+  transition: transform var(--transition);
+}
+
+.cta-btn:hover .cta-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .logo-container {
+    top: 16px;
+    left: 16px;
+  }
+
+  .logo {
+    max-height: 32px;
+  }
+
+  .cta-btn {
+    padding: 14px 28px;
+    font-size: 0.9rem;
+    border-radius: var(--radius-md);
+  }
+
+  #ar-btn {
+    bottom: 90px;
+    right: 14px;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ── Loading / progress bar inside model-viewer ───────────── */
+model-viewer .progress-bar {
+  display: block;
+  width: 33%;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: width 0.4s ease;
+}
+
+/* Fade-in animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-container {
+  animation: fadeUp 0.6s ease 0.3s both;
+}
+
+.cta-container {
+  animation: fadeUp 0.6s ease 0.5s both;
+}
+
+#ar-btn {
+  animation: fadeUp 0.6s ease 0.7s both;
+}
