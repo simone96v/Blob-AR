@@ -1664,8 +1664,18 @@
                     const baseUrl = 'https://simone96v.github.io/Blob-AR/index.html';
                     const params = new URLSearchParams();
 
-                    if (curModelUrl) params.set('model', curModelUrl);
-                    if (curLogo) params.set('logo', curLogo); // Note: local blobs won't work cross-device, but URLs will
+                    let hasLocalBlob = false;
+                    if (curModelUrl) {
+                        params.set('model', curModelUrl);
+                    } else if (curModel && curModel.startsWith('blob:')) {
+                        hasLocalBlob = true;
+                    }
+
+                    if (curLogo && !curLogo.startsWith('blob:')) {
+                        params.set('logo', curLogo);
+                    } else if (curLogo && curLogo.startsWith('blob:')) {
+                        hasLocalBlob = true;
+                    }
 
                     params.set('bg', inpBgType.value === 'gradient' ? `${inpC1.value},${inpC2.value}` : inpBg.value);
                     params.set('cta', togCta.checked);
@@ -1688,6 +1698,15 @@
 
                     pubLink.value = liveUrl;
                     pubIframe.value = iframeCode;
+
+                    // Add warning if local blobs are used
+                    const subText = pubModal.querySelector('.pub-sub');
+                    if (hasLocalBlob) {
+                        subText.innerHTML = '<span style="color:#f87171">⚠️ Note: Local files (dragged-and-dropped) cannot be shared via link. Use "Model URL" for full sharing.</span>';
+                    } else {
+                        subText.textContent = 'Share it with the world or embed it anywhere.';
+                    }
+
                     pubModal.classList.add('open');
                 }, 2000);
             });

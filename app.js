@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('3D Viewer Initialization...');
     const params = new URLSearchParams(window.location.search);
     const viewer = document.getElementById('viewer');
     const logoImg = document.getElementById('logo');
@@ -13,21 +14,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Model
     const model = params.get('model');
-    if (model) viewer.setAttribute('src', model);
+    if (model) {
+        console.log('Loading model URL:', model);
+        viewer.setAttribute('src', model);
+    } else {
+        console.log('No custom model URL provided, using default Astronaut.');
+    }
+
+    viewer.addEventListener('error', (e) => {
+        console.error('Model-viewer loading error:', e.detail);
+    });
 
     // 2. Logo
     const logo = params.get('logo');
     if (logo) {
-        logoImg.src = logo;
-        logoImg.style.display = 'block';
-        qrLogo.src = logo;
-        qrLogo.style.display = 'block';
+        if (logo.startsWith('blob:')) {
+            console.warn('Warning: Logo is a local blob URL. Local files cannot be shared via public links.');
+        } else {
+            console.log('Applying logo URL:', logo);
+            logoImg.src = logo;
+            logoImg.style.display = 'block';
+            qrLogo.src = logo;
+            qrLogo.style.display = 'block';
+        }
     }
 
     // 3. Background
     const bg = params.get('bg');
     if (bg) {
-        document.body.style.background = bg.includes(',') ? `linear-gradient(135deg, ${bg})` : bg;
+        console.log('Applying background:', bg);
+        const bgVal = bg.includes(',') ? `linear-gradient(135deg, ${bg})` : bg;
+        document.body.style.background = bgVal;
+        document.documentElement.style.background = bgVal;
     }
 
     // 4. CTA
@@ -40,17 +58,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctaFf = params.get('font');
     const ctaFs = params.get('fstyle');
 
-    if (showCta && (ctaTx || ctaLk)) {
-        ctaBtn.style.display = 'inline-flex';
-        if (ctaTx) ctaText.textContent = ctaTx;
-        if (ctaLk) ctaBtn.href = ctaLk;
-        if (ctaRadius) ctaBtn.style.borderRadius = ctaRadius + 'px';
-        if (ctaBg) ctaBtn.style.background = ctaBg.includes(',') ? `linear-gradient(90deg, ${ctaBg})` : ctaBg;
-        if (ctaTc) ctaBtn.style.color = ctaTc;
-        if (ctaFf) ctaBtn.style.fontFamily = ctaFf;
-        if (ctaFs) {
-            ctaBtn.style.fontWeight = ctaFs === 'bold' ? '700' : '400';
-            ctaBtn.style.fontStyle = ctaFs === 'italic' ? 'italic' : 'normal';
+    if (showCta) {
+        if (ctaTx || ctaLk) {
+            console.log('Enabling CTA:', ctaTx || 'Discover more');
+            ctaBtn.style.display = 'inline-flex';
+            if (ctaTx) ctaText.textContent = ctaTx;
+            if (ctaLk) ctaBtn.href = ctaLk;
+            if (ctaRadius) ctaBtn.style.borderRadius = ctaRadius + 'px';
+            if (ctaBg) ctaBtn.style.background = ctaBg.includes(',') ? `linear-gradient(90deg, ${ctaBg})` : ctaBg;
+            if (ctaTc) ctaBtn.style.color = ctaTc;
+            if (ctaFf) ctaBtn.style.fontFamily = ctaFf;
+            if (ctaFs) {
+                ctaBtn.style.fontWeight = ctaFs === 'bold' ? '700' : '400';
+                ctaBtn.style.fontStyle = ctaFs === 'italic' ? 'italic' : 'normal';
+            }
+        } else {
+            console.log('CTA logic: showCta is true but no text/link provided.');
         }
     }
 
@@ -67,10 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
     arBtn.addEventListener('click', (e) => {
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         if (isMobile) {
-            // Let model-viewer handle it
+            // Internal handled
         } else {
+            console.log('Desktop detected, showing AR QR Modal');
             e.preventDefault();
-            // Desktop: Show QR
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(window.location.href)}`;
             qrImg.src = qrUrl;
             qrModal.classList.add('open');
@@ -78,4 +101,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     qrClose.addEventListener('click', () => qrModal.classList.remove('open'));
+    console.log('Initialization complete.');
 });
