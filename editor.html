@@ -1323,13 +1323,14 @@
                 if (isMobile) {
                     mv.activateAR();
                 } else {
-                    // Desktop: show QR modal — swap localhost to LAN IP for scannable QR
+                    // Desktop: show QR modal — use live GitHub Pages URL when running locally
                     const loc = window.location;
-                    let qrData = loc.href.split('?')[0]; // base URL without params
-                    if (loc.protocol === 'file:') {
-                        qrData = 'https://example.com';
-                    } else if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') {
-                        qrData = qrData.replace(loc.hostname, '192.168.178.38');
+                    const LIVE_BASE = 'https://simone96v.github.io/Blob-AR/editor.html';
+                    let qrData;
+                    if (loc.protocol === 'file:' || loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') {
+                        qrData = LIVE_BASE;
+                    } else {
+                        qrData = loc.href.split('?')[0];
                     }
                     // append model URL if available
                     if (curModelUrl) {
