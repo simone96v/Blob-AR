@@ -467,121 +467,314 @@
             border: none !important
         }
 
-        /* ── buttons ─────────────────────────────────────────── */
-        .btn-gen {
-            width: 100%;
-            padding: 11px 16px;
-            border: none;
-            border-radius: var(--r);
-            background: var(--tx);
-            color: var(--sb);
-            font-family: var(--font);
-            font-size: .82rem;
-            font-weight: 700;
-            cursor: pointer;
+        /* ── action buttons (sidebar footer) ─────────────────── */
+        .sb-actions {
+            position: sticky;
+            bottom: 0;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease)
+            gap: 10px;
+            padding: 14px 16px;
+            background: var(--sb);
+            border-top: 1px solid var(--bdr);
+            z-index: 10;
+            margin-top: auto
         }
 
-        .btn-gen:hover {
-            opacity: .88;
-            transform: translateY(-1px)
-        }
-
-        .btn-gen:active {
-            transform: scale(.98)
-        }
-
-        .btn-gen svg {
-            width: 15px;
-            height: 15px;
-            stroke: var(--sb);
-            fill: none
-        }
-
-        .embed-out {
-            display: none;
-            margin-top: 12px;
-            animation: fadeIn .3s var(--ease)
-        }
-
-        .embed-out.show {
-            display: block
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-5px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
-        }
-
-        .embed-out textarea {
-            width: 100%;
-            height: 160px;
-            padding: 10px;
-            border: 1px solid var(--bdr);
-            border-radius: var(--r);
-            background: var(--inp);
-            color: var(--gn);
-            font-family: 'Courier New', monospace;
-            font-size: .66rem;
-            resize: vertical;
-            outline: none
-        }
-
-        .brow {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px
-        }
-
-        .brow>button {
-            flex: 1
-        }
-
-        .btn-o {
-            padding: 8px 10px;
+        .btn-save-scene {
+            flex: 1;
+            padding: 11px 12px;
             border: 1px solid var(--bdr);
             border-radius: var(--r);
             background: transparent;
             color: var(--tx2);
             font-family: var(--font);
-            font-size: .72rem;
+            font-size: .78rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 7px;
             transition: all var(--dur) var(--ease)
         }
 
-        .btn-o:hover {
+        .btn-save-scene:hover {
             background: var(--inp);
             border-color: var(--tx3);
             color: var(--tx)
         }
 
-        .btn-o svg {
+        .btn-save-scene svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none
+        }
+
+        .btn-publish {
+            flex: 1.2;
+            padding: 11px 14px;
+            border: none;
+            border-radius: var(--r);
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            font-family: var(--font);
+            font-size: .78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: all var(--dur) var(--ease);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, .3)
+        }
+
+        .btn-publish:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, .4)
+        }
+
+        .btn-publish:active {
+            transform: scale(.98)
+        }
+
+        .btn-publish:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        .btn-publish svg {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none
+        }
+
+        .pub-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255, 255, 255, .3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .6s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* ── toast ───────────────────────────────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(30px);
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: var(--font);
+            font-size: .78rem;
+            font-weight: 600;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .35);
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: all .35s var(--ease);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(99, 102, 241, .3)
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0)
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            stroke: #34d399;
+            fill: none;
+            flex-shrink: 0
+        }
+
+        /* ── publish success modal ───────────────────────────── */
+        .pub-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(0, 0, 0, .65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px
+        }
+
+        .pub-modal.open {
+            display: flex
+        }
+
+        .pub-card {
+            background: #1e1e2e;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 20px;
+            padding: 36px 32px 28px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, .4);
+            text-align: center;
+            animation: modalIn .35s var(--ease)
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(.92) translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0)
+            }
+        }
+
+        .pub-check {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(52, 211, 153, .15), rgba(52, 211, 153, .05));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            border: 1px solid rgba(52, 211, 153, .3)
+        }
+
+        .pub-check svg {
+            width: 28px;
+            height: 28px;
+            stroke: #34d399;
+            fill: none
+        }
+
+        .pub-card h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #f5f5f5;
+            margin-bottom: 6px
+        }
+
+        .pub-card .pub-sub {
+            font-size: .76rem;
+            color: #888;
+            margin-bottom: 22px
+        }
+
+        .pub-field {
+            margin-bottom: 16px;
+            text-align: left
+        }
+
+        .pub-field label {
+            display: block;
+            font-size: .65rem;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px
+        }
+
+        .pub-row {
+            display: flex;
+            gap: 8px
+        }
+
+        .pub-row input,
+        .pub-row textarea {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .04);
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: .74rem;
+            outline: none;
+            transition: border-color var(--dur) var(--ease)
+        }
+
+        .pub-row input:focus,
+        .pub-row textarea:focus {
+            border-color: rgba(99, 102, 241, .5)
+        }
+
+        .pub-row textarea {
+            height: 72px;
+            resize: none
+        }
+
+        .pub-copy {
+            padding: 10px 16px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .06);
+            color: #ccc;
+            font-family: var(--font);
+            font-size: .7rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all var(--dur) var(--ease);
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+
+        .pub-copy:hover {
+            background: rgba(99, 102, 241, .15);
+            border-color: rgba(99, 102, 241, .4);
+            color: #fff
+        }
+
+        .pub-copy svg {
             width: 13px;
             height: 13px;
             stroke: currentColor;
             fill: none
         }
 
-        .btn-o.ok {
-            background: var(--gn-g);
-            border-color: var(--gn);
-            color: var(--gn)
+        .pub-copy.ok {
+            background: rgba(52, 211, 153, .12);
+            border-color: rgba(52, 211, 153, .4);
+            color: #34d399
+        }
+
+        .pub-close {
+            margin-top: 18px;
+            padding: 10px 32px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 50px;
+            background: transparent;
+            color: #aaa;
+            font-family: var(--font);
+            font-size: .78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--dur) var(--ease)
+        }
+
+        .pub-close:hover {
+            background: rgba(255, 255, 255, .06);
+            color: #fff
         }
 
         .sb-ft {
@@ -589,7 +782,6 @@
             text-align: center;
             font-size: .58rem;
             color: var(--tx3);
-            margin-top: auto;
             border-top: 1px solid var(--bdr)
         }
 
@@ -1066,42 +1258,76 @@
             </div>
         </div>
 
-        <!-- E: Export -->
-        <div class="sec">
-            <div class="sec-t">Export</div>
-            <button class="btn-gen" id="btn-gen">
+        <!-- Actions Footer -->
+        <div class="sb-actions">
+            <button class="btn-save-scene" id="btn-save-scene">
                 <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="16 18 22 12 16 6" />
-                    <polyline points="8 6 2 12 8 18" />
+                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
                 </svg>
-                Generate Embed Code
+                Save Scene
             </button>
-            <div class="embed-out" id="embed-out">
-                <textarea readonly id="embed-code"></textarea>
-                <div class="brow">
-                    <button class="btn-o" id="btn-refresh" style="color:var(--ac)">
-                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="23 4 23 10 17 10" />
-                            <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
-                        </svg>Refresh
-                    </button>
-                    <button class="btn-o" id="btn-copy"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" />
-                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                        </svg>Copy Code</button>
-                    <button class="btn-o" id="btn-save" style="color:var(--gn)"><svg viewBox="0 0 24 24"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                        </svg>Save HTML</button>
-                </div>
-            </div>
+            <button class="btn-publish" id="btn-publish">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 16 12 12 8 16" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3" />
+                </svg>
+                Publish
+            </button>
         </div>
 
         <div class="sb-ft">3D Showcase Editor Pro</div>
     </aside>
+
+    <!-- ══════════ PUBLISH SUCCESS MODAL ══════════ -->
+    <div class="pub-modal" id="pub-modal">
+        <div class="pub-card">
+            <div class="pub-check">
+                <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+            </div>
+            <h2>Your 3D Scene is Live!</h2>
+            <p class="pub-sub">Share it with the world or embed it anywhere.</p>
+            <div class="pub-field">
+                <label>Public Link</label>
+                <div class="pub-row">
+                    <input type="text" readonly id="pub-link" />
+                    <button class="pub-copy" id="pub-copy-link">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+            <div class="pub-field">
+                <label>Embed Code</label>
+                <div class="pub-row">
+                    <textarea readonly id="pub-iframe"></textarea>
+                    <button class="pub-copy" id="pub-copy-iframe" style="align-self:flex-start;margin-top:2px">
+                        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" />
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+            <button class="pub-close" id="pub-close">Close</button>
+        </div>
+    </div>
+
+    <!-- ══════════ TOAST ══════════ -->
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span id="toast-msg">Saved!</span>
+    </div>
 
     <!-- ══════════ PREVIEW ══════════ -->
     <main class="preview" id="pv">
@@ -1194,12 +1420,18 @@
             const inpFf = document.getElementById('inp-ff');
             const inpFs = document.getElementById('inp-fs');
 
-            const btnGen = document.getElementById('btn-gen');
-            const embedOut = document.getElementById('embed-out');
-            const embedCode = document.getElementById('embed-code');
-            const btnCopy = document.getElementById('btn-copy');
-            const btnSave = document.getElementById('btn-save');
-            const btnRefresh = document.getElementById('btn-refresh');
+            const btnSaveScene = document.getElementById('btn-save-scene');
+            const btnPublish = document.getElementById('btn-publish');
+
+            const pubModal = document.getElementById('pub-modal');
+            const pubLink = document.getElementById('pub-link');
+            const pubIframe = document.getElementById('pub-iframe');
+            const pubCopyLink = document.getElementById('pub-copy-link');
+            const pubCopyIframe = document.getElementById('pub-copy-iframe');
+            const pubClose = document.getElementById('pub-close');
+
+            const toastEl = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
 
             const qrModal = document.getElementById('qr-modal');
             const qrImg = document.getElementById('qr-img');
@@ -1355,78 +1587,97 @@
                 return (r * 299 + g * 587 + b * 114) / 1000 > 128;
             }
 
-            /* ── generate ──────────────────────────────────── */
-            function generateEmbed() {
-                const ctaBg = inpBgType.value === 'gradient'
-                    ? `linear-gradient(90deg,${inpC1.value},${inpC2.value})`
-                    : inpC1.value;
-                const showCta = togCta.checked;
-                const showAr = togAr.checked;
+            /* ── save / publish / modal logic ─────────────────── */
 
-                const page = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>3D Product Viewer</title>
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"><\/script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:${inpBg.value}}
-    model-viewer{position:fixed;inset:0;width:100%;height:100%}
-    .logo{position:absolute;top:30px;left:50%;transform:translateX(-50%);z-index:10;max-height:40px;width:auto;object-fit:contain;filter:drop-shadow(0 2px 10px rgba(0,0,0,.18))}
-    .cta{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);z-index:10;padding:12px 28px;border:none;border-radius:${inpRad.value}px;background:${ctaBg};color:${inpTc.value};font-family:'Inter',sans-serif;font-size:.86rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 18px rgba(0,0,0,.18);transition:transform .2s}
-    .cta:hover{transform:translateX(-50%) translateY(-2px)}
-    .cta svg{width:14px;height:14px;stroke:currentColor;fill:none}
-    .ar-b{position:absolute;bottom:40px;right:24px;z-index:10;width:52px;height:52px;border-radius:50%;border:none;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);color:#fff;cursor:pointer;display:grid;place-items:center;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:transform .2s}
-    .ar-b:hover{transform:scale(1.08)}
-    .ar-b svg{width:24px;height:24px;stroke:#fff;fill:none}
-    .qr-m{position:fixed;inset:0;z-index:100;background:${inpBg.value};display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px}
-    .qr-m.open{display:flex}
-    .qr-m .t{font-size:1.1rem;font-weight:700;color:#1a1a1a}
-    .qr-m .s{font-size:.82rem;color:#666;text-align:center;max-width:300px}
-    .qr-m img.qr{width:220px;height:220px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
-    .qr-m img.ql{max-height:36px;width:auto}
-    .qr-m img.ql:not([src]),.qr-m img.ql[src=""]{display:none}
-    .qr-m button{padding:10px 28px;border:1px solid #ddd;border-radius:50px;background:#fff;color:#333;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer}
-  </style>
-</head>
-<body>
-  ${curLogo ? `<img class="logo" src="${curLogo}" alt="Logo"/>` : ''}
-  <model-viewer id="mv" src="${curModel}" alt="3D Model" camera-controls ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="${inpShd.checked ? '1' : '0'}"${curHdri ? ` environment-image="${curHdri}"` : ''} touch-action="pan-y"></model-viewer>
-  ${showCta ? `<a class="cta" href="${inpCtaLk.value.trim() || '#'}" target="_blank" rel="noopener">${inpCtaTx.value.trim()} <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>` : ''}
-  ${showAr ? `<button class="ar-b" id="arb" title="View in AR"><svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5.25v7.5L12 21l-9-5.25v-7.5L12 3z"/><path d="M12 12l9-5.25"/><path d="M12 12v9"/><path d="M12 12L3 6.75"/><circle cx="12" cy="12" r="1.5" fill="#fff" stroke="none"/></svg></button>` : ''}
-  ${showAr ? `<div class="qr-m" id="qrm">${curLogo ? `<img class="ql" src="${curLogo}" alt="Logo"/>` : ''}<div class="t">View in Augmented Reality</div><div class="s">Scan this QR code with your phone to see the product in your space</div><img class="qr" id="qri" src="" alt="QR"/><button onclick="document.getElementById('qrm').classList.remove('open')">Close</button></div>` : ''}
-  <script>
-    ${showAr ? `document.getElementById('arb').addEventListener('click',()=>{const m=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);if(m){document.getElementById('mv').activateAR()}else{const q=document.getElementById('qrm');document.getElementById('qri').src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data='+encodeURIComponent(window.location.href);q.classList.add('open')}});` : ''}
-  <\/script>
-</body>
-</html>`;
-
-                embedCode.value = page;
-                embedOut.classList.add('show');
-                embedOut.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            function showToast(msg) {
+                toastMsg.textContent = msg;
+                toastEl.classList.add('show');
+                setTimeout(() => toastEl.classList.remove('show'), 2400);
             }
 
-            btnGen.addEventListener('click', generateEmbed);
-            btnRefresh.addEventListener('click', () => { generateEmbed(); flash(btnRefresh, 'Updated!'); });
+            function flashCopy(btn, msg) {
+                const orig = btn.innerHTML;
+                btn.classList.add('ok');
+                btn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${msg}`;
+                setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('ok'); }, 2000);
+            }
 
-            /* ── copy / save ───────────────────────────────── */
-            btnCopy.addEventListener('click', () => { navigator.clipboard.writeText(embedCode.value).then(() => flash(btnCopy, 'Copied!')); });
-            btnSave.addEventListener('click', () => {
-                const c = embedCode.value; if (!c) return;
-                const b = new Blob([c], { type: 'text/html' }), u = URL.createObjectURL(b);
-                const a = document.createElement('a'); a.href = u; a.download = 'viewer.html';
-                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u);
-                flash(btnSave, 'Saved!');
+            /* ── Save Scene (localStorage) ─────────────────────── */
+            btnSaveScene.addEventListener('click', () => {
+                const scene = {
+                    bg: inpBg.value,
+                    shadow: inpShd.checked,
+                    ctaEnabled: togCta.checked,
+                    arEnabled: togAr.checked,
+                    ctaText: inpCtaTx.value,
+                    ctaLink: inpCtaLk.value,
+                    bgType: inpBgType.value,
+                    color1: inpC1.value,
+                    color2: inpC2.value,
+                    radius: inpRad.value,
+                    textColor: inpTc.value,
+                    fontFamily: inpFf.value,
+                    fontStyle: inpFs.value,
+                    modelUrl: curModelUrl
+                };
+                localStorage.setItem('blob-ar-scene', JSON.stringify(scene));
+                showToast('Scene Saved Locally!');
             });
 
-            function flash(btn, msg) {
-                const o = btn.innerHTML; btn.classList.add('ok');
-                btn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${msg}`;
-                setTimeout(() => { btn.innerHTML = o; btn.classList.remove('ok'); }, 2000);
+            /* ── Restore scene on load ─────────────────────────── */
+            try {
+                const saved = JSON.parse(localStorage.getItem('blob-ar-scene'));
+                if (saved) {
+                    inpBg.value = saved.bg || inpBg.value; hxBg.textContent = inpBg.value.toUpperCase(); pvBox.style.background = inpBg.value;
+                    inpShd.checked = saved.shadow !== false; mv.setAttribute('shadow-intensity', inpShd.checked ? '1' : '0');
+                    togCta.checked = saved.ctaEnabled !== false; pvCta.style.display = togCta.checked ? '' : 'none'; secCta.classList.toggle('off', !togCta.checked);
+                    togAr.checked = saved.arEnabled !== false; arBtn.style.display = togAr.checked ? '' : 'none';
+                    inpCtaTx.value = saved.ctaText || inpCtaTx.value; pvCta.textContent = inpCtaTx.value;
+                    inpCtaLk.value = saved.ctaLink || inpCtaLk.value; pvCta.href = inpCtaLk.value.trim() || '#';
+                    inpBgType.value = saved.bgType || 'solid'; fldC2.style.display = inpBgType.value === 'gradient' ? '' : 'none';
+                    inpC1.value = saved.color1 || inpC1.value; hxC1.textContent = inpC1.value.toUpperCase();
+                    inpC2.value = saved.color2 || inpC2.value; hxC2.textContent = inpC2.value.toUpperCase();
+                    inpRad.value = saved.radius || inpRad.value; rvRad.textContent = inpRad.value + 'px';
+                    inpTc.value = saved.textColor || inpTc.value; hxTc.textContent = inpTc.value.toUpperCase();
+                    inpFf.value = saved.fontFamily || inpFf.value;
+                    inpFs.value = saved.fontStyle || inpFs.value;
+                    if (saved.modelUrl) { curModelUrl = saved.modelUrl; curModel = saved.modelUrl; inpModelUrl.value = saved.modelUrl; mv.setAttribute('src', saved.modelUrl); }
+                    applyCtaStyle();
+                }
+            } catch (e) { /* ignore parse errors */ }
+
+            /* ── Publish flow ──────────────────────────────────── */
+            function genSlug() {
+                return Array.from(crypto.getRandomValues(new Uint8Array(4))).map(b => b.toString(16).padStart(2, '0')).join('');
             }
+
+            btnPublish.addEventListener('click', () => {
+                const origHTML = btnPublish.innerHTML;
+                btnPublish.disabled = true;
+                btnPublish.innerHTML = `<span class="pub-spinner"></span> Publishing…`;
+
+                setTimeout(() => {
+                    btnPublish.disabled = false;
+                    btnPublish.innerHTML = origHTML;
+
+                    const slug = genSlug();
+                    const liveUrl = `https://3d-showcase.app/v/${slug}`;
+                    const iframeCode = `<iframe src="${liveUrl}" width="100%" height="600" frameborder="0" allow="xr-spatial-tracking" allowfullscreen></iframe>`;
+
+                    pubLink.value = liveUrl;
+                    pubIframe.value = iframeCode;
+                    pubModal.classList.add('open');
+                }, 2000);
+            });
+
+            /* ── Modal copy buttons ────────────────────────────── */
+            pubCopyLink.addEventListener('click', () => {
+                navigator.clipboard.writeText(pubLink.value).then(() => flashCopy(pubCopyLink, 'Copied!'));
+            });
+            pubCopyIframe.addEventListener('click', () => {
+                navigator.clipboard.writeText(pubIframe.value).then(() => flashCopy(pubCopyIframe, 'Copied!'));
+            });
+            pubClose.addEventListener('click', () => { pubModal.classList.remove('open'); });
         })();
     </script>
 </body>
